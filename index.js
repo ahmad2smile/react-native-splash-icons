@@ -3,85 +3,88 @@ const { promisify } = require("util")
 const sizeOf = promisify(require("image-size"))
 
 function ensureDirectory (dir) {
-	return fs
-		.ensureDir(dir)
-		.then(() => {
-			console.log("success!")
-		})
-		.catch(err => {
-			console.error(err)
-		})
+	return fs.ensureDir(dir).catch(err => {
+		console.error("Error in Checking Dir: ", err.Error)
+	})
 }
 
 function ensureFile (file) {
-	return fs
-		.ensureFile(file)
-		.then(res => {
-			console.log("File ensure success!", res)
-		})
-		.catch(err => {
-			console.error(err)
-		})
+	return fs.ensureFile(file).catch(err => {
+		console.error("Error in Checking File: ", err.Error)
+	})
 }
 
 function ensureImageSize (img) {
 	return sizeOf(img)
 		.then(dimensions => {
-			console.log(dimensions.width, dimensions.height)
 			return { width: dimensions.width, height: dimensions.height }
 		})
-		.catch(err => console.error(err))
-}
-
-function copyFiles (from, to) {
-	return fs
-		.copy(from, to)
-		.then(() => {
-			console.log("success!")
-		})
 		.catch(err => {
-			console.error(err)
+			console.error("Error in Checking Image Size: ", err.Error)
 		})
 }
 
-const images = [
-	"./Default-568h@2x.png",
-	"./Default-568h@2x~iphone.png",
-	"./Default-667h.png",
-	"./Default-736h.png",
-	"./Default-Landscape-736h.png",
-	"./Default-Landscape@2x.png",
-	"./Default-Landscape@2x~ipad.png",
-	"./Default-Landscape~ipad.png",
-	"./Default-Portrait@2x~ipad.png",
-	"./Default-Portrait~ipad.png",
-	"./Default@2x~iphone.png",
-	"./Default~iphone.png"
-]
+function copyFiles (from, to, filter) {
+	return fs.copy(from, to, { filter }).catch(err => {
+		console.error("Error in Copying Files: ", err.Error)
+	})
+}
 
-const imgSizes = [
-	{ width: 320, height: 480 },
-	{ width: 640, height: 960 },
-	{ width: 640, height: 1136 },
-	{ width: 640, height: 1136 },
-	{ width: 750, height: 1334 },
-	{ width: 768, height: 1024 },
-	{ width: 1024, height: 768 },
-	{ width: 1242, height: 2208 },
-	{ width: 1536, height: 2048 },
-	{ width: 2208, height: 1242 },
-	{ width: 2048, height: 1536 },
-	{ width: 2048, height: 1536 }
-]
-
-images.map(img => {
-	ensureFile(img).then(() => {
-		ensureImageSize(img).then(imgs => {
-			console.log("====================================")
-			console.log(Array.from(new Set(imgSizes)))
-			console.log("====================================")
+function copyIOSSplash (projectName) {
+	return ensureDirectory("./assets/images/ios/splash/").then(() => {
+		copyFiles(
+			"./assets/images/ios/splash/",
+			"./ios/Epicor/Images.xcassets/LaunchImage.launchimage"
+		).catch(err => {
+			console.log("Error in Copying iOS Splash: ", err)
 		})
 	})
-})
+}
 
-// ensureDirectory("./ios/Scheduling//Images.xcassets/LaunchImage.launchimage")
+function copyIOSIcons (projectName) {
+	return ensureDirectory("./assets/images/ios/splash/").then(() => {
+		copyFiles(
+			"./assets/images/ios/splash/",
+			`./ios/${projectName}/Images.xcassets/AppIcon.appiconset`
+		).catch(err => {
+			console.log("Error in Copying iOS Icons: ", err)
+		})
+	})
+}
+
+function copyAndroidSplash (projectName) {
+	return ensureDirectory("./assets/images/ios/splash/").then(() => {
+		copyFiles(
+			"./assets/images/ios/splash/",
+			"./ios/Epicor/Images.xcassets/LaunchImage.launchimage"
+		).catch(err => {
+			console.log("Error in Copying Android Splash: ", err)
+		})
+	})
+}
+
+function copyAndroidIcons () {
+	const baseDir = "./android/app/src/main/res/"
+	const srcDir = "./assets/images/android/icons/"
+	const iconDirs = [
+		{ name: "drawable", size: { width: 1024, height: 1024 } },
+		{ name: "mipmap-hdpi", size: { width: 72, height: 72 } },
+		{ name: "mipmap-mdpi", size: { width: 48, height: 48 } },
+		{ name: "mipmap-xhdpi", size: { width: 96, height: 96 } },
+		{ name: "mipmap-xxhdpi", size: { width: 144, height: 144 } }
+	]
+
+	iconDirs.forEach(iconDir => {
+		ensureDirectory(srcDir).then(() => {
+			return copyFiles(srcDir + iconDir.name, baseDir + iconDir.name, async (src, dest) => {
+				const { width, height } = await ensureImageSize(src)
+				console.log("=======iconDir.size.width========")
+				console.log(width, iconDir.size.width)
+				console.log("====================================")
+				return iconDir.size.width === width && iconDir.size.height === height
+			})
+		})
+	})
+}
+
+copyAndroidIcons()
