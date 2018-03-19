@@ -1,6 +1,11 @@
 const fs = require("fs-extra")
-const { promisify } = require("util")
-const sizeOf = promisify(require("image-size"))
+const pkg = require("./package.json")
+
+const assetsDir = pkg.assetsDir_RNSI
+const projectName = pkg.projectName_RNSI
+
+// const { promisify } = require("util")
+// const sizeOf = promisify(require("image-size"))
 
 function ensureDirectory (dir) {
 	return fs.ensureDir(dir).catch(err => {
@@ -14,15 +19,16 @@ function ensureFile (file) {
 	})
 }
 
-function ensureImageSize (img) {
-	return sizeOf(img)
-		.then(dimensions => {
-			return { width: dimensions.width, height: dimensions.height }
-		})
-		.catch(err => {
-			console.error("Error in Checking Image Size: ", err.Error)
-		})
-}
+// Future endeavors
+// function ensureImageSize (img) {
+// 	return sizeOf(img)
+// 		.then(dimensions => {
+// 			return { width: dimensions.width, height: dimensions.height }
+// 		})
+// 		.catch(err => {
+// 			console.error("Error in Checking Image Size: ", err.Error)
+// 		})
+// }
 
 function copyFiles (from, to, filter) {
 	return fs.copy(from, to, { filter }).catch(err => {
@@ -30,35 +36,43 @@ function copyFiles (from, to, filter) {
 	})
 }
 
-function copyIOSSplash (projectName) {
-	return ensureDirectory("./assets/images/ios/splash/").then(() => {
+function copyIOSSplash () {
+	const srcDir = assetsDir + "ios/splash/"
+
+	return ensureDirectory(srcDir).then(() => {
 		copyFiles(
 			"./assets/images/ios/splash/",
-			"./ios/Epicor/Images.xcassets/LaunchImage.launchimage"
-		).catch(err => {
-			console.log("Error in Copying iOS Splash: ", err)
-		})
+			`./ios/${projectName}/Images.xcassets/LaunchImage.launchimage`
+		)
 	})
 }
 
-function copyIOSIcons (projectName) {
+function copyIOSIcons () {
 	return ensureDirectory("./assets/images/ios/splash/").then(() => {
 		copyFiles(
 			"./assets/images/ios/splash/",
 			`./ios/${projectName}/Images.xcassets/AppIcon.appiconset`
-		).catch(err => {
-			console.log("Error in Copying iOS Icons: ", err)
-		})
+		)
 	})
 }
 
-function copyAndroidSplash (projectName) {
-	return ensureDirectory("./assets/images/ios/splash/").then(() => {
-		copyFiles(
-			"./assets/images/ios/splash/",
-			"./ios/Epicor/Images.xcassets/LaunchImage.launchimage"
-		).catch(err => {
-			console.log("Error in Copying Android Splash: ", err)
+function copyAndroidSplash () {
+	const baseDir = "./android/app/src/main/res/"
+	const srcDir = "./assets/images/android/splash/"
+	const splashDirs = [
+		{ name: "drawable-ldpi", size: { width: 240, height: 320 } },
+		{ name: "drawable-hdpi", size: { width: 480, height: 800 } },
+		{ name: "drawable-mdpi", size: { width: 320, height: 480 } },
+		{ name: "drawable-xhdpi", size: { width: 720, height: 1280 } },
+		{ name: "drawable-xxhdpi", size: { width: 960, height: 1600 } },
+		{ name: "drawable-xxxhdpi", size: { width: 1280, height: 1920 } }
+	]
+
+	splashDirs.forEach(splashDir => {
+		ensureDirectory(srcDir).then(() => {
+			ensureFile(baseDir + splashDir.name + "/screen.png").then(() => {
+				copyFiles(srcDir + splashDir.name, baseDir + splashDir.name)
+			})
 		})
 	})
 }
@@ -77,20 +91,14 @@ function copyAndroidIcons () {
 	iconDirs.forEach(iconDir => {
 		ensureDirectory(srcDir).then(() => {
 			ensureFile(baseDir + iconDir.name + "/icon.png").then(() => {
-				return copyFiles(
-					srcDir + iconDir.name,
-					baseDir + iconDir.name
-					// async (src, dest) => {
-					// 	console.log("====================================")
-					// 	console.log(baseDir + iconDir.name + "/icon.png")
-					// 	console.log("====================================")
-					// 	const { width, height } = await ensureImageSize(src)
-					// 	return iconDir.size.width === width && iconDir.size.height === height
-					// }
-				)
+				copyFiles(srcDir + iconDir.name, baseDir + iconDir.name)
 			})
 		})
 	})
 }
 
+copyIOSIcons()
+copyIOSSplash()
+
 copyAndroidIcons()
+copyAndroidSplash()

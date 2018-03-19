@@ -14,7 +14,7 @@
 	"rules": {
 		"react/jsx-uses-react": "error",
 		"react/jsx-uses-vars": "error",
-		"no-console": 1,
+		"no-console": 0,
 		"quotes": [
 			2,
 			"double",
