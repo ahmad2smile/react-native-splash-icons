@@ -1,8 +1,8 @@
 const fs = require("fs-extra")
 const pkg = require("./package.json")
 
-const assetsDir = pkg.assetsDir_RNSI
-const projectName = pkg.projectName_RNSI
+const assetsDir = pkg.RNSI.assetsDir
+const projectName = pkg.RNSI.projectName
 
 // const { promisify } = require("util")
 // const sizeOf = promisify(require("image-size"))
@@ -40,19 +40,31 @@ function copyIOSSplash () {
 	const srcDir = assetsDir + "ios/splash/"
 
 	return ensureDirectory(srcDir).then(() => {
-		copyFiles(
-			"./assets/images/ios/splash/",
-			`./ios/${projectName}/Images.xcassets/LaunchImage.launchimage`
-		)
+		if (projectName) {
+			copyFiles(
+				"./assets/images/ios/splash/",
+				`./ios/${projectName}/Images.xcassets/LaunchImage.launchimage`
+			)
+		} else {
+			console.log(
+				"Please a valid Project Name in package.json. \n'RNSI': { 'projectName': 'dummyName' }"
+			)
+		}
 	})
 }
 
 function copyIOSIcons () {
 	return ensureDirectory("./assets/images/ios/splash/").then(() => {
-		copyFiles(
-			"./assets/images/ios/splash/",
-			`./ios/${projectName}/Images.xcassets/AppIcon.appiconset`
-		)
+		if (projectName) {
+			copyFiles(
+				"./assets/images/ios/splash/",
+				`./ios/${projectName}/Images.xcassets/AppIcon.appiconset`
+			)
+		} else {
+			console.log(
+				"Please a valid Project Name in package.json. \n'RNSI': { 'projectName': 'dummyName' }"
+			)
+		}
 	})
 }
 
