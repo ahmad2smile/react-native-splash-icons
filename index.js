@@ -64,6 +64,9 @@ function copyIOSIcons (projectName, assetsDir) {
 	const srcDir = assetsDir + "ios/icons/"
 	return ensureDirectory(srcDir).then(() => {
 		if (projectName) {
+			console.log("============Running IOS Shit==============")
+			console.log(srcDir, `./ios/${projectName}/Images.xcassets/AppIcon.appiconset`)
+			console.log("====================================")
 			copyFiles(srcDir, `./ios/${projectName}/Images.xcassets/AppIcon.appiconset`)
 		} else {
 			console.log(
