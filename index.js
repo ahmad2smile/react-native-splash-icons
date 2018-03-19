@@ -1,8 +1,4 @@
 const fs = require("fs-extra")
-const pkg = require("./package.json")
-
-const assetsDir = pkg.RNSI_assetsDir
-const projectName = pkg.RNSI_projectName
 
 // const { promisify } = require("util")
 // const sizeOf = promisify(require("image-size"))
@@ -36,15 +32,19 @@ function copyFiles (from, to, filter) {
 	})
 }
 
-function copyIOSSplash () {
+/**
+ * Setup Splash Screens for iOS
+ *
+ * @param {any} projectName Name of your React Native Project
+ * @param {any} assetsDir location of 'ios/splash/' folder
+ *
+ */
+function copyIOSSplash (projectName, assetsDir) {
 	const srcDir = assetsDir + "ios/splash/"
 
 	return ensureDirectory(srcDir).then(() => {
 		if (projectName) {
-			copyFiles(
-				"./assets/images/ios/splash/",
-				`./ios/${projectName}/Images.xcassets/LaunchImage.launchimage`
-			)
+			copyFiles(srcDir, `./ios/${projectName}/Images.xcassets/LaunchImage.launchimage`)
 		} else {
 			console.log(
 				"Please a valid Project Name in package.json. \n'RNSI': { 'projectName': 'dummyName' }"
@@ -53,13 +53,18 @@ function copyIOSSplash () {
 	})
 }
 
-function copyIOSIcons () {
-	return ensureDirectory("./assets/images/ios/splash/").then(() => {
+/**
+ * Setup Icons for iOS
+ *
+ * @param {any} projectName Name of your React Native Project
+ * @param {any} assetsDir location of 'ios/icons/' folder
+ *
+ */
+function copyIOSIcons (projectName, assetsDir) {
+	const srcDir = assetsDir + "ios/icons/"
+	return ensureDirectory(srcDir).then(() => {
 		if (projectName) {
-			copyFiles(
-				"./assets/images/ios/splash/",
-				`./ios/${projectName}/Images.xcassets/AppIcon.appiconset`
-			)
+			copyFiles(srcDir, `./ios/${projectName}/Images.xcassets/AppIcon.appiconset`)
 		} else {
 			console.log(
 				"Please a valid Project Name in package.json. \n'RNSI': { 'projectName': 'dummyName' }"
@@ -68,9 +73,16 @@ function copyIOSIcons () {
 	})
 }
 
-function copyAndroidSplash () {
+/**
+ * Setup Splash Screens for Android
+ *
+ * @param {any} projectName Name of your React Native Project
+ * @param {any} assetsDir location of 'android/splash/' folder
+ *
+ */
+function copyAndroidSplash (assetsDir) {
 	const baseDir = "./android/app/src/main/res/"
-	const srcDir = "./assets/images/android/splash/"
+	const srcDir = assetsDir + "android/splash/"
 	const splashDirs = [
 		{ name: "drawable-ldpi", size: { width: 240, height: 320 } },
 		{ name: "drawable-hdpi", size: { width: 480, height: 800 } },
@@ -89,9 +101,16 @@ function copyAndroidSplash () {
 	})
 }
 
-function copyAndroidIcons () {
+/**
+ * Setup Icons for Android
+ *
+ * @param {any} projectName Name of your React Native Project
+ * @param {any} assetsDir location of 'android/icons/' folder
+ *
+ */
+function copyAndroidIcons (assetsDir) {
 	const baseDir = "./android/app/src/main/res/"
-	const srcDir = "./assets/images/android/icons/"
+	const srcDir = assetsDir + "android/icons/"
 	const iconDirs = [
 		{ name: "drawable", size: { width: 1024, height: 1024 } },
 		{ name: "mipmap-hdpi", size: { width: 72, height: 72 } },
@@ -109,8 +128,9 @@ function copyAndroidIcons () {
 	})
 }
 
-copyIOSIcons()
-copyIOSSplash()
-
-copyAndroidIcons()
-copyAndroidSplash()
+module.exports = {
+	copyIOSIcons,
+	copyIOSSplash,
+	copyAndroidIcons,
+	copyAndroidSplash
+}
