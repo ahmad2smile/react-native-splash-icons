@@ -1,8 +1,8 @@
 const fs = require("fs-extra")
 const pkg = require("./package.json")
 
-const assetsDir = pkg.RNSI.assetsDir
-const projectName = pkg.RNSI.projectName
+const assetsDir = pkg.RNSI_assetsDir
+const projectName = pkg.RNSI_projectName
 
 // const { promisify } = require("util")
 // const sizeOf = promisify(require("image-size"))
