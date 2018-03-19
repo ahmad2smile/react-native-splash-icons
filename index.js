@@ -26,7 +26,7 @@ function ensureImageSize (img) {
 
 function copyFiles (from, to, filter) {
 	return fs.copy(from, to, { filter }).catch(err => {
-		console.error("Error in Copying Files: ", err.Error)
+		console.error("Error in Copying Files from", from, " :", err)
 	})
 }
 
@@ -76,12 +76,18 @@ function copyAndroidIcons () {
 
 	iconDirs.forEach(iconDir => {
 		ensureDirectory(srcDir).then(() => {
-			return copyFiles(srcDir + iconDir.name, baseDir + iconDir.name, async (src, dest) => {
-				const { width, height } = await ensureImageSize(src)
-				console.log("=======iconDir.size.width========")
-				console.log(width, iconDir.size.width)
-				console.log("====================================")
-				return iconDir.size.width === width && iconDir.size.height === height
+			ensureFile(baseDir + iconDir.name + "/icon.png").then(() => {
+				return copyFiles(
+					srcDir + iconDir.name,
+					baseDir + iconDir.name
+					// async (src, dest) => {
+					// 	console.log("====================================")
+					// 	console.log(baseDir + iconDir.name + "/icon.png")
+					// 	console.log("====================================")
+					// 	const { width, height } = await ensureImageSize(src)
+					// 	return iconDir.size.width === width && iconDir.size.height === height
+					// }
+				)
 			})
 		})
 	})
