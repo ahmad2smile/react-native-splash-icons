@@ -1,6 +1,6 @@
 {
 	"name": "react-native-splash-icons",
-	"version": "1.0.0",
+	"version": "0.0.1",
 	"description": "Node Package to change react native splash screens and icons",
 	"main": "index.js",
 	"bin": {
@@ -13,13 +13,7 @@
 		"type": "git",
 		"url": "https://github.com/ahmad2smile/react-native-splash-icons.git"
 	},
-	"keywords": [
-		"copy-files",
-		".gitignore",
-		"config-files",
-		"common-files",
-		"common-includes"
-	],
+	"keywords": ["copy-files", "react-native", "react-native-splash-icons", "splash screen"],
 	"devDependencies": {
 		"babel-eslint": "^8.2.2",
 		"eslint": "^4.13.0",
